@@ -1,0 +1,112 @@
+<html>
+<head>
+<title>ColorMe</title>
+<script type="text/javascript" src="static/scripts/omg.js">
+</script>
+</head>
+
+<body>
+<h1>THE COLORS OF BEYONCE</h1>
+<script type="text/javascript">
+  var API_KEY = 'ZGVAKWNW7O9YDBOOD';
+  var URL_BASE = 'http://developer.echonest.com/api/v4/';
+
+  function query(url) {
+    console.log(url);
+    var xmlHttp = null;
+
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", url, false );
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
+
+  }
+
+  function querySongs(artist) {
+    var url = URL_BASE + 'song/search?api_key=' + API_KEY + 
+      '&artist=' + artist.replace(/ /g, '+') + 
+      '&bucket=audio_summary';// +
+      //'&sort=song_hotttnesss-desc';
+      return query(url);
+  }
+
+  function queryTrack(song) {
+    var url = URL_BASE + 'track/profile?api_key=' + API_KEY + 
+      '&format=json&id=' + song.id + '&bucket=audio_summary';
+    return query(url);
+  }
+
+  function calcHue(audio_summary) {
+    sp = audio_summary.speechiness;
+    ac = audio_summary.acousticness;
+    li = audio_summary.liveness;
+    if (sp > ac && sp > li) {
+      return sp * 120 + 60;
+    } else if (ac > sp && ac > li) {
+      return ac * 120 + 180;
+    } else if (li > sp && li > ac) {
+      return ac * 120 + 300;
+    } else {
+      console.log('wat?');
+      return 250;
+    }
+  }
+
+  function getColor(song) {
+    var audio_summary = song.audio_summary;
+
+    var hue = calcHue(audio_summary);
+    //console.log("tempo " + audio_summary.tempo + "->" + hue);
+
+    var sat = audio_summary.energy * 100;
+
+    var lit = audio_summary.danceability * 100;
+    //console.log("lit: " + audio_summary.danceability + " -> " + lit);
+    var alpha = (audio_summary.loudness + 100) / 267 + .25
+    //console.log("alpha: " + audio_summary.loudness + " -> " + alpha);
+    return {h:hue, s:sat, l:lit, a:alpha};
+  }
+
+  function getHSLA(hsla) {
+    var csv = hsla.h + "," + hsla.s + "%," + hsla.l + "%," + hsla.a;
+    return "hsla(" + csv + ")";
+  }
+
+  function getStyle(hsla) {
+    var div = "style=\"background-color: " + getHSLA(hsla) + ";\"";
+    //var div = "<div style=\"background-color: hsla(" + csv + ");\"></div>";
+    return div;
+  }
+
+  function drawCanvas(song) {
+    document.write("<h2>" + song.title + "</h2>");
+    document.write("<canvas id=\"block\" width=\"1200\" height=\"100\">" + 
+                   "</canvas>");
+    var canvas = document.getElementById("block");
+    var context = canvas.getContext("2d");
+    context.fillStyle = getHSLA(getColor(song));
+    context.fillRect(0,0,1200,100);
+  }
+
+  var artist = 'bob dylan';
+  var beyonce = querySongs(artist);
+  beysongs = JSON.parse(beyonce).response.songs;
+
+  drawCanvas(beysongs[0]);
+  var str = "<h2>more " + artist + "</h2><ul>"
+  for (var i = 1; i < beysongs.length; i++) {
+    bsong = beysongs[i].title;
+    str += "<li " + getStyle(getColor(beysongs[i])) 
+                  + ">" + bsong + "</li>";
+    //str += "<li>" + bsong + "</li>";
+  }
+  document.write(str + "</ul>");
+  
+
+</script>
+
+</body>
+</html>
+
+
+
