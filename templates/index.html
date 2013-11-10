@@ -1,9 +1,13 @@
 <html>
 <head>
 <title>ColorMe</title>
-<script type="text/javascript" src="static/scripts/omg.js">
 </script>
 </head>
+<style type="text/css">
+  body {
+    font-family:"Lucida Sans Unicode"
+  }
+</style>
 
 <body>
 <h1>THE COLORS OF BEYONCE</h1>
@@ -30,12 +34,6 @@
       return query(url);
   }
 
-  function queryTrack(song) {
-    var url = URL_BASE + 'track/profile?api_key=' + API_KEY + 
-      '&format=json&id=' + song.id + '&bucket=audio_summary';
-    return query(url);
-  }
-
   function calcHue(audio_summary) {
     sp = audio_summary.speechiness;
     ac = audio_summary.acousticness;
@@ -56,14 +54,10 @@
     var audio_summary = song.audio_summary;
 
     var hue = calcHue(audio_summary);
-    //console.log("tempo " + audio_summary.tempo + "->" + hue);
-
     var sat = audio_summary.energy * 100;
-
     var lit = audio_summary.danceability * 100;
-    //console.log("lit: " + audio_summary.danceability + " -> " + lit);
     var alpha = (audio_summary.loudness + 100) / 267 + .25
-    //console.log("alpha: " + audio_summary.loudness + " -> " + alpha);
+
     return {h:hue, s:sat, l:lit, a:alpha};
   }
 
@@ -98,11 +92,9 @@
     bsong = beysongs[i].title;
     str += "<li " + getStyle(getColor(beysongs[i])) 
                   + ">" + bsong + "</li>";
-    //str += "<li>" + bsong + "</li>";
   }
   document.write(str + "</ul>");
   
-
 </script>
 
 </body>
