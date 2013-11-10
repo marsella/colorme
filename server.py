@@ -5,7 +5,12 @@ app = Flask(__name__)
 
 @app.route('/')
 def start():
-  return render_template('index.html')
+  return artist('beyonce')
+
+@app.route('/<string:artist>')
+def artist(artist):
+  return render_template('index.html', artist=artist)
+
 
 if __name__ == "__main__":
   app.debug = True

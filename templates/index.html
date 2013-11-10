@@ -10,7 +10,6 @@
 </style>
 
 <body>
-<h1>THE COLORS OF BEYONCE</h1>
 <script type="text/javascript">
   var API_KEY = 'ZGVAKWNW7O9YDBOOD';
   var URL_BASE = 'http://developer.echonest.com/api/v4/';
@@ -29,8 +28,7 @@
   function querySongs(artist) {
     var url = URL_BASE + 'song/search?api_key=' + API_KEY + 
       '&artist=' + artist.replace(/ /g, '+') + 
-      '&bucket=audio_summary';// +
-      //'&sort=song_hotttnesss-desc';
+      '&bucket=audio_summary';
       return query(url);
   }
 
@@ -50,13 +48,17 @@
     }
   }
 
+  function calcAlpha(loudness) {
+    return (loudness + 100) / 267 + .25;
+  }
+
   function getColor(song) {
     var audio_summary = song.audio_summary;
 
     var hue = calcHue(audio_summary);
     var sat = audio_summary.energy * 100;
     var lit = audio_summary.danceability * 100;
-    var alpha = (audio_summary.loudness + 100) / 267 + .25
+    var alpha = calcAlpha(audio_summary.loudness); 
 
     return {h:hue, s:sat, l:lit, a:alpha};
   }
@@ -73,16 +75,35 @@
   }
 
   function drawCanvas(song) {
+    WIDTH = 1200;
     document.write("<h2>" + song.title + "</h2>");
-    document.write("<canvas id=\"block\" width=\"1200\" height=\"100\">" + 
-                   "</canvas>");
+    document.write("<canvas id=\"block\" width=\"" + WIDTH 
+                   + "\" height=\"100\">" + "</canvas>");
     var canvas = document.getElementById("block");
     var context = canvas.getContext("2d");
-    context.fillStyle = getHSLA(getColor(song));
-    context.fillRect(0,0,1200,100);
+
+    deets = query(song.audio_summary.analysis_url);
+    console.log(song.audio_summary.analysis_url);
+    segments = JSON.parse(deets).segments;
+    width = WIDTH / segments.length;
+
+    var color = getColor(song);
+    for(var i = 0; i < segments.length; i++) {
+      alpha = calcAlpha(segments[i].loudness_start);
+      light = .5 * (color.l + timbreSaturation(segments[i].timbre));
+      sectionColor = {h:color.h,s:color.s,l:light,a:alpha};
+      context.fillStyle = getHSLA(sectionColor);
+      context.fillRect(i*width,0,(i+1)*width,100);
+    }
   }
 
-  var artist = 'bob dylan';
+  function timbreSaturation(timbre) {
+    return timbre[1] + 100 / 267;
+  }
+
+  var artist = '{{ artist }}';
+  console.log( artist);
+  document.write("<h1>THE COLORS OF " + artist.toUpperCase() + "</h1>");
   var beyonce = querySongs(artist);
   beysongs = JSON.parse(beyonce).response.songs;
 
