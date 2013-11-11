@@ -90,14 +90,14 @@
     var color = getColor(song);
     for(var i = 0; i < segments.length; i++) {
       alpha = calcAlpha(segments[i].loudness_start);
-      light = .5 * (color.l + timbreSaturation(segments[i].timbre));
+      light = .5 * (color.l + timbreCalc(segments[i].timbre));
       sectionColor = {h:color.h,s:color.s,l:light,a:alpha};
       context.fillStyle = getHSLA(sectionColor);
       context.fillRect(i*width,0,(i+1)*width,100);
     }
   }
 
-  function timbreSaturation(timbre) {
+  function timbreCalc(timbre) {
     return timbre[1] + 100 / 267;
   }
 
@@ -124,8 +124,47 @@
   document.write(str + "</ul>");
   
 </script>
-
+<div>
+  <h1>What Does It All Mean??!?</h1>
+  <p>This app is powered by <a href='http://echonest.com/'>the Echo Nest</a>,
+  which has a massive music database. When I started designing this, I
+  decided to use <a href='http://css-tricks.com/yay-for-hsla/'>HSLa color
+  values</a>, which breaks down colors into the hue, saturation, light,
+  and alpha (transparency) values. I thought this breakdown would provide a
+  more interesting characteristic for unique songs than the more commonly
+  used RGB values.  </p>
+  <ul> 
+  <li><b>Hue</b> <p> Songs are divided into categories based on three
+  characteristics: acousticness, speechiness, and liveness. Acoustic
+  artists, like Jack Johnson, are in the purple-blue spectrum. Songs with
+  high speechiness are green--try Jay Z or Pitbull. Lively songs are pink, as
+  you've seen with Beyonce.</p></li>
+  <li><b>Saturation</b> <p>This determines how bright or dull a color is, and is
+  based on the energy of a song. Chill artists, like Bon Iver or Phish, are
+  duller, while any high-energy pop song will be brighter.<p></li>
+  <li><b>Light</b><p> This is the brightness of a song. It's determined by a
+  combination of the danceability (which is constant for any given song) and
+  a characteristic known as brightness. Ask a musician for a better
+  explanation of what brightness is.</p></li>
+  <li><b>Transparency</b><p> The transparency is determined by how loud a
+  song is. Check out Skrillex--the dark spot 2/3 of the way through
+  Bangarang is the drop. </p>
+</div>
+</div>
+  <h2>How Do I Use It??</h2>
+  Add any artist onto the end of the url. Replace spaces with plus signs (+).
+  For example, <a href="http://54.235.157.129:5000/jack+johnson">
+                        http://54.235.157.129:5000/jack+johnson</a> or
+  <a href="http://54.235.157.129:5000/skrillex">
+           http://54.235.157.129:5000/skrillex</a>. Maybe I'll host it on a
+  proper domain sometime...
 </body>
+<footer style="font-size:12px"> 
+  <p> Built by Marcella Hastings at the 2013 Music Hack Day.
+  Source code available on 
+  <a href='https://github.com/marsella/colorme'>Github</a>.
+  Powered by <a href='http://echonest.com/'>the Echo Nest</a>
+</footer>
 </html>
 
 
