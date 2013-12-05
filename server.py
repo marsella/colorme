@@ -5,12 +5,12 @@ app = Flask(__name__)
 
 @app.route('/')
 def start():
-  return artist('beyonce')
+  return render_template('index.html', artist='rihanna')
 
-@app.route('/<string:artist>')
-def artist(artist):
+@app.route('/artist', methods=['GET'])
+def artistGet():
+  artist = request.args.get('artist')
   return render_template('index.html', artist=artist)
-
 
 if __name__ == "__main__":
   app.debug = True
